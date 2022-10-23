@@ -11,12 +11,15 @@ class Database:
         self.genres = genres
         self.songs = {}
 
-    def relevant_genres(self, music):
-        pass
+    def relevant_genres(self, song_bytes: bytes, media_format: str):
+        folder_path = os.path.join(self.path, 'requests')
+        Song.save_bytes(song_bytes, folder_path, media_format)
+        song = Song.load_request_song(folder_path, media_format)
+        return song.mfcc
 
     def calculate_index(self):
         for song_path, genre in self.__iterate_songs():
-            song = Song(genre, song_path)
+            song = Song(song_path, genre)
             self.songs[song.name] = song
 
     def __iterate_songs(self):
