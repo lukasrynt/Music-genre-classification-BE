@@ -17,9 +17,9 @@ def ping():
 
 
 @app.post("/relevant_genres/")
-async def relevant_genres(media_format: str, song: bytes = File()):
+def relevant_genres(media_format: str, song: bytes = File()):
     log_request(song, media_format)
-    return db.relevant_genres(song, media_format)[0].tolist()
+    return db.relevant_genres(song, media_format)
 
 
 if __name__ == "__main__":

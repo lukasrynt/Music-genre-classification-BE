@@ -18,7 +18,7 @@ def plot_barycenter(song):
     plt.show()
 
 
-def time_warp_dist(x, y):
+def time_warp_dist(x, y) -> float:
     distance, path = fastdtw(x, y, dist=euclidean)
     return distance
 
