@@ -1,8 +1,9 @@
 import os
 
 import librosa
-
-from src.visualization import time_warp_dist
+from fastdtw import fastdtw
+from scipy.spatial.distance import euclidean
+from tslearn.barycenters import dtw_barycenter_averaging
 
 REQUEST_SONG_NAME = 'req'
 
@@ -20,8 +21,16 @@ class Song:
     def delete_file(self):
         os.remove(self.path)
 
+    def get_barycenter(self):
+        return dtw_barycenter_averaging(self.mfcc)
+
     def distance_from(self, other, min_len: int) -> float:
-        return time_warp_dist(self.mfcc[:, :min_len], other.mfcc[:, :min_len])
+        return self.time_warp_dist(self.mfcc[:, :min_len], other.mfcc[:, :min_len])
+
+    @staticmethod
+    def time_warp_dist(x, y) -> float:
+        distance, path = fastdtw(x, y, dist=euclidean)
+        return distance
 
     @staticmethod
     def save_bytes(song: bytes, path: str, media_format: str):

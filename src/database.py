@@ -27,21 +27,21 @@ class Database:
 
     def calculate_distances(self, other_song: Song) -> Dict[str, float]:
         res = {}
-        min_dimension = min(self.__get_min_mfcc_dim(), other_song.mfcc.shape[1])
-        map(lambda x: x.mfcc.shape[1], self.songs.values())
+        min_dimension = min(self.get_min_mfcc_dim(), other_song.mfcc.shape[1])
         for genre, songs in self.songs.items():
             res[genre] = sum([other_song.distance_from(song, min_dimension) for (song_name, song) in songs.items()])
         return res
 
-    def __get_min_mfcc_dim(self):
-        arr = [songs.values() for songs in self.songs.values()]
-        return min([min(map(lambda x: x.mfcc.shape[1], arr)) for arr in arr])
+    def get_min_mfcc_dim(self):
+        arr = [song for songs in self.songs.values() for song in songs.values()]
+        return min(map(lambda x: x.mfcc.shape[1], arr))
 
     @staticmethod
     def __normalize_distances(distances: Dict[str, float]) -> Dict[str, float]:
-        distance_sum = sum(distances.values())
+        rev_distances = {k: 1 / v for k, v in distances.items()}
+        distance_sum = sum(rev_distances.values())
         return {genre: ((distance / distance_sum) * 100) for (genre, distance)
-                in sorted(distances.items(), key=lambda item: item[1])}
+                in sorted(rev_distances.items(), key=lambda item: -item[1])}
 
     def __iterate_songs(self):
         for genre in self.genres:
