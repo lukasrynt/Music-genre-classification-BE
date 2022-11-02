@@ -20,7 +20,7 @@ class Visualizer:
 
     def visualize_barycenters(self):
         barycenters = self.__get_barycenters()
-        reduced = self.__tsne_reduce(barycenters, perplexity=10)
+        reduced = self.__tsne_reduce(barycenters, perplexity=20)
         plt.figure(figsize=(12, 6))
         scatter = plt.scatter(reduced[1], reduced[2], c=reduced.genre, cmap='jet')
         handles, _ = scatter.legend_elements()

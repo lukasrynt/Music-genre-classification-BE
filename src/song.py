@@ -24,8 +24,8 @@ class Song:
     def get_barycenter(self):
         return dtw_barycenter_averaging(self.mfcc)
 
-    def distance_from(self, other, min_len: int) -> float:
-        return self.time_warp_dist(self.mfcc[:, :min_len], other.mfcc[:, :min_len])
+    def distance_from(self, other) -> float:
+        return self.time_warp_dist(self.mfcc.T, other.mfcc.T)
 
     @staticmethod
     def time_warp_dist(x, y) -> float:
@@ -45,4 +45,4 @@ class Song:
         return f"{self.genre}-{int(path.split('/')[-1].split('.')[1])}"
 
     def __set_mfcc(self):
-        self.mfcc = librosa.feature.mfcc(y=self.y, sr=self.samplerate)
+        self.mfcc = librosa.feature.mfcc(y=self.y, sr=self.samplerate, n_mfcc=3)

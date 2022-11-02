@@ -27,9 +27,8 @@ class Database:
 
     def calculate_distances(self, other_song: Song) -> Dict[str, float]:
         res = {}
-        min_dimension = min(self.get_min_mfcc_dim(), other_song.mfcc.shape[1])
         for genre, songs in self.songs.items():
-            res[genre] = sum([other_song.distance_from(song, min_dimension) for (song_name, song) in songs.items()])
+            res[genre] = sum([other_song.distance_from(song) for (song_name, song) in songs.items()])
         return res
 
     def get_min_mfcc_dim(self):

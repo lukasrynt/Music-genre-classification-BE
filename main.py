@@ -3,7 +3,7 @@ from fastapi import FastAPI, File
 from src.database import Database
 
 app = FastAPI()
-db = Database('./data', ['classical', 'jazz', 'rock', 'hiphop', 'reggae', 'country', 'metal'], 50)
+db = Database('./data', ['classical', 'jazz', 'rock', 'hiphop', 'reggae', 'country', 'metal'], 10)
 db.calculate_index()
 
 
