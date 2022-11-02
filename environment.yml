@@ -12,6 +12,5 @@ dependencies:
     - pandas
     - librosa
     - matplotlib
-    - fastdtw
     - tslearn
     - python-multipart

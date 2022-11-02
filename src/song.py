@@ -1,8 +1,7 @@
 import os
 
 import librosa
-from fastdtw import fastdtw
-from scipy.spatial.distance import euclidean
+from .dynamic_time_warp import dtw
 from tslearn.barycenters import dtw_barycenter_averaging
 
 REQUEST_SONG_NAME = 'req'
@@ -25,12 +24,7 @@ class Song:
         return dtw_barycenter_averaging(self.mfcc)
 
     def distance_from(self, other) -> float:
-        return self.time_warp_dist(self.mfcc.T, other.mfcc.T)
-
-    @staticmethod
-    def time_warp_dist(x, y) -> float:
-        distance, path = fastdtw(x, y, dist=euclidean)
-        return distance
+        return dtw(self.mfcc.T, other.mfcc.T)
 
     @staticmethod
     def save_bytes(song: bytes, path: str, media_format: str):
