@@ -39,4 +39,4 @@ class Song:
         return f"{self.genre}-{int(path.split('/')[-1].split('.')[1])}"
 
     def __set_mfcc(self):
-        self.mfcc = librosa.feature.mfcc(y=self.y, sr=self.samplerate, n_mfcc=3)
+        self.mfcc = librosa.feature.mfcc(y=self.y, sr=self.samplerate, n_mfcc=5)
