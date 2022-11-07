@@ -1,21 +1,23 @@
 import os
 from typing import List, Dict
 
-from src.song import Song
+from .song import Song
+from .autoencoder.conv_autoencoder import ConvAutoencoder
 
 
 class Database:
-    def __init__(self, path: str, genres: List[str], songs_per_genre: int = 10):
+    def __init__(self, path: str, genres: List[str], autoencoder: ConvAutoencoder = None, songs_per_genre: int = 10):
+        self.autoencoder = autoencoder
         self.songs_per_genre = songs_per_genre
         self.path = path
         self.genres = genres
         self.songs = {key: {} for key in genres}
 
-    def relevant_genres(self, song_bytes: bytes, media_format: str) -> Dict[str, float]:
+    def relevant_genres(self, song_bytes: bytes, media_format: str, strategy: str) -> Dict[str, float]:
         folder_path = os.path.join(self.path, 'requests')
         Song.save_bytes(song_bytes, folder_path, media_format)
         song = Song.load_request_song(folder_path, media_format)
-        distances = self.calculate_distances(song)
+        distances = self.calculate_distances(song, strategy)
         percentages = self.__normalize_distances(distances)
         song.delete_file()
         return percentages
@@ -23,12 +25,14 @@ class Database:
     def calculate_index(self):
         for song_path, genre in self.__iterate_songs():
             song = Song(song_path, genre)
+            if self.autoencoder:
+                song.precalculate_embedding(self.autoencoder)
             self.songs[genre][song.name] = song
 
-    def calculate_distances(self, other_song: Song) -> Dict[str, float]:
+    def calculate_distances(self, other_song: Song, strategy: str) -> Dict[str, float]:
         res = {}
         for genre, songs in self.songs.items():
-            res[genre] = sum([other_song.distance_from(song) for (song_name, song) in songs.items()])
+            res[genre] = sum([other_song.distance_from(song, strategy) for (song_name, song) in songs.items()])
         return res
 
     def get_min_mfcc_dim(self):

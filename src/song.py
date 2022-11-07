@@ -1,10 +1,20 @@
 import os
 
 import librosa
+import numpy as np
+
+from .autoencoder.conv_autoencoder import ConvAutoencoder
+from .autoencoder.song import WeightedSongEmbedding
 from .dynamic_time_warp import dtw
 from tslearn.barycenters import dtw_barycenter_averaging
 
 REQUEST_SONG_NAME = 'req'
+
+
+class UnsupportedStrategyError(Exception):
+    def __init__(self, strategy):
+        self.message = f'{strategy} is not among allowed strategies - only mfcc and autoencoder is allowed'
+        super().__init__(self.message)
 
 
 class Song:
@@ -14,6 +24,7 @@ class Song:
         self.path = path
         self.y, self.samplerate = librosa.load(path)
         self.__set_mfcc()
+        self.embedding = None
         if not genre == 'unknown':
             self.name = self.__get_song_name(path)
 
@@ -23,8 +34,17 @@ class Song:
     def get_barycenter(self):
         return dtw_barycenter_averaging(self.mfcc)
 
-    def distance_from(self, other) -> float:
-        return dtw(self.mfcc.T, other.mfcc.T)
+    def distance_from(self, other, strategy: str) -> float:
+        if strategy == 'mfcc':
+            return dtw(self.mfcc.T, other.mfcc.T)
+        elif strategy == 'autoencoder':
+            return np.linalg.norm(self.embedding - other.embedding)
+        else:
+            raise UnsupportedStrategyError(strategy)
+
+    def precalculate_embedding(self, autoencoder: ConvAutoencoder):
+        if not self.embedding:
+            self.embedding = WeightedSongEmbedding(self).calculate_embedding(autoencoder)
 
     @staticmethod
     def save_bytes(song: bytes, path: str, media_format: str):

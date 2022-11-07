@@ -1,9 +1,19 @@
+import os
+
+import torch
 import uvicorn
-from fastapi import FastAPI, File
+from fastapi import FastAPI, File, status, HTTPException
+
+from src.autoencoder.conv_autoencoder import ConvAutoencoder
 from src.database import Database
+from src.song import UnsupportedStrategyError
 
 app = FastAPI()
-db = Database('./data', ['classical', 'jazz', 'rock', 'hiphop', 'reggae', 'country', 'metal'], 10)
+autoencoder = ConvAutoencoder()
+if os.path.isfile('./autoencoder.pth'):
+    autoencoder.load_state_dict(torch.load('./autoencoder.pth'))
+db = Database('./data', ['classical', 'jazz', 'rock', 'hiphop', 'reggae', 'country', 'metal'],
+              autoencoder, songs_per_genre=10)
 db.calculate_index()
 
 
@@ -17,9 +27,22 @@ def ping():
 
 
 @app.post("/relevant_genres/")
-def relevant_genres(media_format: str, song: bytes = File()):
+def relevant_genres(media_format: str, strategy: str, song: bytes = File()):
+    """
+    Calculates the most relevant genres for the song
+    :param media_format: media format of song
+    :param strategy: either 'mfcc' or 'autoencoder' strategy
+    :param song: the bytes of song
+    :return: dictionary of genres mapped to their percentage values
+    """
     log_request(song, media_format)
-    return db.relevant_genres(song, media_format)
+    try:
+        return db.relevant_genres(song, media_format, strategy)
+    except UnsupportedStrategyError as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=e.message
+        )
 
 
 if __name__ == "__main__":
