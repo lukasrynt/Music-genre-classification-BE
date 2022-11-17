@@ -1,6 +1,9 @@
 import os
 from typing import List, Dict
 
+from audioread import NoBackendError
+from soundfile import LibsndfileError
+
 from .song import Song
 from .autoencoder.conv_autoencoder import ConvAutoencoder
 
@@ -24,10 +27,15 @@ class Database:
 
     def calculate_index(self):
         for song_path, genre in self.__iterate_songs():
-            song = Song(song_path, genre)
-            if self.autoencoder:
-                song.precalculate_embedding(self.autoencoder)
-            self.songs[genre][song.name] = song
+            try:
+                song = Song(song_path, genre)
+                if self.autoencoder:
+                    song.precalculate_embedding(self.autoencoder)
+                self.songs[genre][song.name] = song
+            except LibsndfileError:
+                print(f"Song at path {song_path} contains invalid data")
+            except NoBackendError:
+                print(f"Song at path {song_path} contains invalid data")
 
     def calculate_distances(self, other_song: Song, strategy: str) -> Dict[str, float]:
         res = {}

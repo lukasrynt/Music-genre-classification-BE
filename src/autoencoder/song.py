@@ -1,6 +1,8 @@
 import librosa
 import numpy as np
 import torch
+from audioread import NoBackendError
+from soundfile import LibsndfileError
 
 from src.autoencoder.conv_autoencoder import ConvAutoencoder
 
@@ -13,7 +15,9 @@ class SegmentedSong:
         self.spec_data = None
         try:
             self.spec_data = self.__get_spec_data()
-        except:
+        except LibsndfileError:
+            pass
+        except NoBackendError:
             pass
 
     def __len__(self):
