@@ -11,7 +11,7 @@ from src.song import UnsupportedStrategyError
 app = FastAPI()
 autoencoder = ConvAutoencoder()
 if os.path.isfile('./autoencoder.pth'):
-    autoencoder.load_state_dict(torch.load('./autoencoder.pth'))
+    autoencoder.load_state_dict(torch.load('./autoencoder.pth', map_location=torch.device('cpu')))
 db = Database('./data', ['classical', 'jazz', 'rock', 'hiphop', 'reggae', 'country', 'metal'],
               autoencoder, songs_per_genre=10)
 db.calculate_index()
