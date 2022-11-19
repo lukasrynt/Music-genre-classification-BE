@@ -20,6 +20,8 @@ class Database:
         folder_path = os.path.join(self.path, 'requests')
         Song.save_bytes(song_bytes, folder_path)
         song = Song.load_request_song(folder_path)
+        if strategy == 'autoencoder':
+            song.precalculate_embedding()
         distances = self.calculate_distances(song, strategy)
         percentages = self.__normalize_distances(distances)
         song.delete_file()
