@@ -3,12 +3,24 @@ import os
 import torch
 import uvicorn
 from fastapi import FastAPI, File, status, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 
 from src.autoencoder.conv_autoencoder import ConvAutoencoder
 from src.database import Database
 from src.song import UnsupportedStrategyError
 
 app = FastAPI()
+
+origins = ["*"]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 autoencoder = ConvAutoencoder()
 if os.path.isfile('./autoencoder.pth'):
     autoencoder.load_state_dict(torch.load('./autoencoder.pth', map_location=torch.device('cpu')))
