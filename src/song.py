@@ -47,13 +47,13 @@ class Song:
             self.embedding = WeightedSongEmbedding(self).calculate_embedding(autoencoder)
 
     @staticmethod
-    def save_bytes(song: bytes, path: str, media_format: str):
-        with open(os.path.join(path, f'{REQUEST_SONG_NAME}.{media_format}'), 'wb') as f:
+    def save_bytes(song: bytes, path: str):
+        with open(os.path.join(path, f'{REQUEST_SONG_NAME}.mp3'), 'wb') as f:
             f.write(song)
 
     @staticmethod
-    def load_request_song(path: str, media_format: str):
-        return Song(os.path.join(path, f'{REQUEST_SONG_NAME}.{media_format}'))
+    def load_request_song(path: str):
+        return Song(os.path.join(path, f'{REQUEST_SONG_NAME}.mp3'))
 
     def __get_song_name(self, path: str):
         return f"{self.genre}-{int(path.split('/')[-1].split('.')[1])}"

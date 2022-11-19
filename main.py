@@ -17,8 +17,8 @@ db = Database('./data', ['classical', 'jazz', 'rock', 'hiphop', 'reggae', 'count
 db.calculate_index()
 
 
-def log_request(song: bytes, media_format: str):
-    print(f'Received bytes of length: {len(song)} with format: {media_format}')
+def log_request(song: bytes):
+    print(f'Received bytes of length: {len(song)}')
 
 
 @app.get("/ping/")
@@ -27,17 +27,16 @@ def ping():
 
 
 @app.post("/relevant_genres/")
-def relevant_genres(media_format: str, strategy: str, song: bytes = File()):
+def relevant_genres(strategy: str, song: bytes = File()):
     """
     Calculates the most relevant genres for the song
-    :param media_format: media format of song
     :param strategy: either 'mfcc' or 'autoencoder' strategy
     :param song: the bytes of song
     :return: dictionary of genres mapped to their percentage values
     """
-    log_request(song, media_format)
+    log_request(song)
     try:
-        return db.relevant_genres(song, media_format, strategy)
+        return db.relevant_genres(song, strategy)
     except UnsupportedStrategyError as e:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,

@@ -16,10 +16,10 @@ class Database:
         self.genres = genres
         self.songs = {key: {} for key in genres}
 
-    def relevant_genres(self, song_bytes: bytes, media_format: str, strategy: str) -> Dict[str, float]:
+    def relevant_genres(self, song_bytes: bytes, strategy: str) -> Dict[str, float]:
         folder_path = os.path.join(self.path, 'requests')
-        Song.save_bytes(song_bytes, folder_path, media_format)
-        song = Song.load_request_song(folder_path, media_format)
+        Song.save_bytes(song_bytes, folder_path)
+        song = Song.load_request_song(folder_path)
         distances = self.calculate_distances(song, strategy)
         percentages = self.__normalize_distances(distances)
         song.delete_file()
