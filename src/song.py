@@ -48,6 +48,8 @@ class Song:
 
     @staticmethod
     def save_bytes(song: bytes, path: str):
+        if not os.path.exists(path):
+            os.makedirs(path)
         with open(os.path.join(path, f'{REQUEST_SONG_NAME}.mp3'), 'wb') as f:
             f.write(song)
 
