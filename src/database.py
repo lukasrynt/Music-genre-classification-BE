@@ -53,7 +53,7 @@ class Database:
     def __normalize_distances(distances: Dict[str, float]) -> Dict[str, float]:
         rev_distances = {k: 1 / v for k, v in distances.items()}
         distance_sum = sum(rev_distances.values())
-        return {genre: ((distance / distance_sum) * 100) for (genre, distance)
+        return {genre: round((distance / distance_sum) * 100, 2) for (genre, distance)
                 in sorted(rev_distances.items(), key=lambda item: -item[1])}
 
     def __iterate_songs(self):
