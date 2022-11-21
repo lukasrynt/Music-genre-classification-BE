@@ -54,7 +54,7 @@ class Database:
         rev_distances = {k: 1 / v for k, v in distances.items()}
         distance_sum = sum(rev_distances.values())
         return {genre: round((distance / distance_sum) * 100, 2) for (genre, distance)
-                in sorted(rev_distances.items(), key=lambda item: -item[1])}
+                in rev_distances.items()}
 
     def __iterate_songs(self):
         for genre in self.genres:
