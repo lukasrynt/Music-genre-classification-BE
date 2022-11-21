@@ -1,14 +1,9 @@
 import numpy as np
 
-
-def euclidean():
-    def inside(x: int, y: int):
-        return np.linalg.norm(x - y)
-
-    return inside
+from scipy.spatial.distance import euclidean
 
 
-def dtw(first, second, window: int = 10, distance=euclidean()):
+def dtw(first, second, window: int = 10, distance=euclidean):
     n = len(first)
     m = len(second)
     window = max(window, abs(n - m))
